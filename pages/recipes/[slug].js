@@ -1,6 +1,7 @@
 import {createClient} from 'contentful'
 import Image from 'next/image'
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
+import Skeleton from '../../components/Skeleton';
 
 const client = createClient({
     //그냥 하면 github에 공개되니까 환경변수 사용해서 한다.
@@ -19,8 +20,10 @@ export const getStaticPaths = async () => {
         }
     })
     return{
+        //fallback - 없는 페이지 접근하면 어떻게 대응하냐 하는것. false면 404
+        //revalidate해서 새로운 페이지가 생겨났을때 fallback이 false면 그 페이지는 404가 뜬다.
         paths,
-        fallback:false
+        fallback:true
     }
 }
 
@@ -38,6 +41,9 @@ export async function getStaticProps({params}) {
 }
 
 export default function RecipeDetails({recipe}) {
+
+    if(!recipe) return <Skeleton />
+
     const {featuredImage,title,cookingTime,ingredients,method} = recipe.fields
     return (
         <div>
